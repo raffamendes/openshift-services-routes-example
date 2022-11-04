@@ -1,0 +1,79 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  name: spring-boot-services-routes-example
+  labels:
+    app: spring-boot-services-routes-example
+    app.kubernetes.io/component: spring-boot-services-routes-example
+    app.kubernetes.io/instance: spring-boot-services-routes-example
+    app.kubernetes.io/name: spring-boot
+    app.openshift.io/runtime: spring-boot
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers: []
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: spring-boot-services-routes-example
+    deploymentConfig: spring-boot-services-routes-example
+  template:
+    metadata:
+      labels:
+        app: spring-boot-services-routes-example
+        deploymentConfig: spring-boot-services-routes-example
+      annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+    spec:
+      containers:
+        - name: spring-boot-services-routes-example
+          image: change:me
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          terminationMessagePath: /dev/termination-log
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: "470Mi"
+              cpu: "110m"
+            limits:
+              memory: "640Mi"
+              cpu: "960m"
+          imagePullPolicy: Always
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
